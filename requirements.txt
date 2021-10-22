@@ -1,0 +1,4 @@
+Flask==2.0.2
+requests==2.18.4
+celery==5.1.2
+tinydb==4.5.2
