@@ -45,6 +45,8 @@ sy_to_op = {
     '>': operator.gt
 }
 
+with open('query_action.json') as fp:
+    qa_dict = json.load(fp)  # query_action dict
 
 @celery.task(name="tasks.add_tweet_to_db_and_process")
 def add_tweet_to_db_and_process(req_json):
@@ -64,15 +66,13 @@ def add_tweet_to_db_and_process(req_json):
 
 @celery.task(name="tasks.process_tweet")
 def process_tweet(tweet):
-    with open('query_action.json') as fp:
-        qa_dict = json.load(fp)  # query_action dict
-        for query in qa_dict.values():
-            param = query[0] # query on which attribute
-            tweet_param_val = tweet.get(param, '') # value of that attribute in tweet
-            operation = sy_to_op[query[1]]
-            if tweet_param_val:
-                if operation(tweet_param_val, query[2]):
-                    print(f'{query} condition fulfilled')
+    for query in qa_dict.values():
+        param = query[0] # query on which attribute
+        tweet_param_val = tweet.get(param, '') # value of that attribute in tweet
+        operation = sy_to_op[query[1]]
+        if tweet_param_val:
+            if operation(tweet_param_val, query[2]):
+                print(f'{query} condition fulfilled')
     print("---- TWEET PROCESSED ----")
 
 
